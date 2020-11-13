@@ -34,7 +34,17 @@ class ActivityLogger
     {
         $this->auth = $auth;
 
-        $this->authDriver = $config['activitylog']['default_auth_driver'] ?? $auth->getDefaultDriver();
+        $activeGuard = null;
+        foreach (array_keys(config('auth.guards')) as $guard) {
+
+            if (auth()->guard($guard)->check()) {
+                $activeGuard = $guard;
+                continue;
+            }
+
+        }
+
+        $this->authDriver = $activeGuard ?? $auth->getDefaultDriver();
 
         $this->defaultLogName = $config['activitylog']['default_log_name'];
 
